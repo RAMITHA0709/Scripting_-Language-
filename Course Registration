@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Registration System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .course-item {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .course-item.booked {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        .course-item.available {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>University Course Registration System</h1>
+        
+        <div class="form-group">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" placeholder="Enter your full name">
+        </div>
+        
+        <div class="form-group">
+            <label for="studentId">Student ID:</label>
+            <input type="text" id="studentId" placeholder="Enter your student ID">
+        </div>
+        
+        <div class="form-group">
+            <label for="courseFilter">Filter by Department:</label>
+            <select id="courseFilter">
+                <option value="all">All Departments</option>
+                <option value="CS">Computer Science</option>
+                <option value="MATH">Mathematics</option>
+                <option value="PHYS">Physics</option>
+                <option value="ENG">Engineering</option>
+            </select>
+        </div>
+        
+        <h3>Available Courses:</h3>
+        <div id="coursesList"></div>
+        
+        <h3>Your Registered Courses:</h3>
+        <div id="registeredCourses"></div>
+        
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        // Course data with availability
+        let courses = [
+            {
+                id: 'CS101',
+                name: 'Introduction to Programming',
+                department: 'CS',
+                credits: 3,
+                maxStudents: 30,
+                enrolledStudents: 25,
+                description: 'Basic programming concepts using JavaScript'
+            },
+            {
+                id: 'CS201',
+                name: 'Data Structures',
+                department: 'CS',
+                credits: 4,
+                maxStudents: 25,
+                enrolledStudents: 25,
+                description: 'Advanced data structures and algorithms'
+            },
+            {
+                id: 'MATH101',
+                name: 'Calculus I',
+                department: 'MATH',
+                credits: 3,
+                maxStudents: 40,
+                enrolledStudents: 35,
+                description: 'Differential and integral calculus'
+            },
+            {
+                id: 'PHYS101',
+                name: 'General Physics',
+                department: 'PHYS',
+                credits: 4,
+                maxStudents: 30,
+                enrolledStudents: 20,
+                description: 'Classical mechanics and thermodynamics'
+            },
+            {
+                id: 'ENG101',
+                name: 'Engineering Fundamentals',
+                department: 'ENG',
+                credits: 3,
+                maxStudents: 35,
+                enrolledStudents: 30,
+                description: 'Basic engineering principles and design'
+            }
+        ];
+
+        let registeredCourses = [];
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function isCourseAvailable(course) {
+            return course.enrolledStudents < course.maxStudents;
+        }
+
+        function registerForCourse(courseId) {
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentId = document.getElementById('studentId').value.trim();
+            
+            if (!studentName || !studentId) {
+                showStatus('Please enter your name and student ID before registering.', 'error');
+                return;
+            }
+
+            const course = courses.find(c => c.id === courseId);
+            const alreadyRegistered = registeredCourses.find(c => c.id === courseId);
+            
+            if (alreadyRegistered) {
+                showStatus(`You are already registered for ${course.name}.`, 'error');
+                return;
+            }
+
+            if (!isCourseAvailable(course)) {
+                showStatus(`Sorry, ${course.name} is fully booked.`, 'error');
+                return;
+            }
+
+            // Register the student
+            course.enrolledStudents++;
+            registeredCourses.push(course);
+            
+            showStatus(`Successfully registered for ${course.name}!`, 'success');
+            updateCoursesDisplay();
+            updateRegisteredCoursesDisplay();
+            
+            // Automatically update availability
+            if (!isCourseAvailable(course)) {
+                showStatus(`${course.name} is now fully booked.`, 'info');
+            }
+        }
+
+        function unregisterFromCourse(courseId) {
+            const course = courses.find(c => c.id === courseId);
+            const registeredIndex = registeredCourses.findIndex(c => c.id === courseId);
+            
+            if (registeredIndex !== -1) {
+                course.enrolledStudents--;
+                registeredCourses.splice(registeredIndex, 1);
+                showStatus(`Successfully unregistered from ${course.name}.`, 'success');
+                updateCoursesDisplay();
+                updateRegisteredCoursesDisplay();
+            }
+        }
+
+        function updateCoursesDisplay() {
+            const filter = document.getElementById('courseFilter').value;
+            const coursesContainer = document.getElementById('coursesList');
+            
+            let filteredCourses = courses;
+            if (filter !== 'all') {
+                filteredCourses = courses.filter(course => course.department === filter);
+            }
+            
+            coursesContainer.innerHTML = '';
+            
+            filteredCourses.forEach(course => {
+                const isAvailable = isCourseAvailable(course);
+                const isRegistered = registeredCourses.find(c => c.id === course.id);
+                
+                const courseDiv = document.createElement('div');
+                courseDiv.className = `course-item ${isAvailable ? 'available' : 'booked'}`;
+                
+                courseDiv.innerHTML = `
+                    <h4>${course.name} (${course.id})</h4>
+                    <p><strong>Department:</strong> ${course.department}</p>
+                    <p><strong>Credits:</strong> ${course.credits}</p>
+                    <p><strong>Description:</strong> ${course.description}</p>
+                    <p><strong>Availability:</strong> ${course.enrolledStudents}/${course.maxStudents} students enrolled</p>
+                    <p><strong>Status:</strong> ${isAvailable ? 'Available' : 'Fully Booked'}</p>
+                    ${isRegistered ? 
+                        '<button onclick="unregisterFromCourse(\'' + course.id + '\')">Unregister</button>' :
+                        '<button onclick="registerForCourse(\'' + course.id + '\')" ' + 
+                        (isAvailable ? '' : 'disabled') + '>Register</button>'
+                    }
+                `;
+                
+                coursesContainer.appendChild(courseDiv);
+            });
+        }
+
+        function updateRegisteredCoursesDisplay() {
+            const container = document.getElementById('registeredCourses');
+            
+            if (registeredCourses.length === 0) {
+                container.innerHTML = '<p>No courses registered yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            let totalCredits = 0;
+            
+            registeredCourses.forEach(course => {
+                totalCredits += course.credits;
+                const courseDiv = document.createElement('div');
+                courseDiv.className = 'course-item available';
+                
+                courseDiv.innerHTML = `
+                    <h4>${course.name} (${course.id})</h4>
+                    <p><strong>Credits:</strong> ${course.credits}</p>
+                    <p><strong>Department:</strong> ${course.department}</p>
+                    <button onclick="unregisterFromCourse('${course.id}')">Unregister</button>
+                `;
+                
+                container.appendChild(courseDiv);
+            });
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = `<p><strong>Total Credits: ${totalCredits}</strong></p>`;
+            container.appendChild(summaryDiv);
+        }
+
+        // Event listeners
+        document.getElementById('courseFilter').addEventListener('change', updateCoursesDisplay);
+
+        // Initialize the display
+        updateCoursesDisplay();
+        updateRegisteredCoursesDisplay();
+    </script>
+</body>
+</html>
