@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Design Portfolio Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 3em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gallery-controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .animate-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .animate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .animate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .image-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .image-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-card:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .overlay-text {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .image-card:hover .overlay-text {
+            transform: translateY(0);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-category {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .like-btn {
+            background: none;
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .like-btn:hover {
+            background: #ff6b6b;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .like-btn.liked {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease forwards;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease forwards;
+        }
+
+        .zoom-in {
+            animation: zoomIn 0.8s ease forwards;
+        }
+
+        .rotate-in {
+            animation: rotateIn 0.8s ease forwards;
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease forwards;
+        }
+
+        /* Initially hide elements for animation */
+        .gallery .image-card {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-180deg) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: rotate(0deg) scale(1);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(-100px);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05) translateY(0);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #ff6b6b;
+            transform: scale(1.2);
+        }
+
+        .stats {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .stats h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Design Portfolio Gallery</h1>
+        
+        <div class="gallery-controls">
+            <button class="animate-btn" onclick="animateImages('fade-in')">✨ Fade In</button>
+            <button class="animate-btn" onclick="animateImages('slide-in-left')">⬅️ Slide Left</button>
+            <button class="animate-btn" onclick="animateImages('slide-in-right')">➡️ Slide Right</button>
+            <button class="animate-btn" onclick="animateImages('zoom-in')">🔍 Zoom In</button>
+            <button class="animate-btn" onclick="animateImages('rotate-in')">🔄 Rotate In</button>
+            <button class="animate-btn" onclick="animateImages('bounce-in')">🏀 Bounce In</button>
+        </div>
+
+        <div class="gallery" id="gallery">
+            <!-- Images will be dynamically generated -->
+        </div>
+
+        <div class="stats">
+            <h3>📊 Gallery Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalImages">0</div>
+                    <div>Total Images</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalLikes">0</div>
+                    <div>Total Likes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="viewCount">0</div>
+                    <div>Total Views</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="animationCount">0</div>
+                    <div>Animations Played</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-size image viewing -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <img class="modal-image" id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        // Sample design portfolio data
+        const portfolioItems = [
+            {
+                id: 1,
+                title: "Modern Website Design",
+                description: "A sleek and responsive website design for a tech startup with clean typography and vibrant colors.",
+                category: "Web Design",
+                image: "https://picsum.photos/400/300?random=1",
+                likes: 0
+            },
+            {
+                id: 2,
+                title: "Mobile App Interface",
+                description: "User-friendly mobile app interface design with intuitive navigation and smooth user experience.",
+                category: "UI/UX",
+                image: "https://picsum.photos/400/300?random=2",
+                likes: 0
+            },
+            {
+                id: 3,
+                title: "Brand Identity Package",
+                description: "Complete brand identity design including logo, color palette, and brand guidelines for a creative agency.",
+                category: "Branding",
+                image: "https://picsum.photos/400/300?random=3",
+                likes: 0
+            },
+            {
+                id: 4,
+                title: "E-commerce Platform",
+                description: "Modern e-commerce website design with focus on conversion optimization and user engagement.",
+                category: "E-commerce",
+                image: "https://picsum.photos/400/300?random=4",
+                likes: 0
+            },
+            {
+                id: 5,
+                title: "Corporate Presentation",
+                description: "Professional presentation design for corporate clients with data visualization and modern layouts.",
+                category: "Presentation",
+                image: "https://picsum.photos/400/300?random=5",
+                likes: 0
+            },
+            {
+                id: 6,
+                title: "Social Media Campaign",
+                description: "Creative social media graphics and campaign materials for brand awareness and engagement.",
+                category: "Social Media",
+                image: "https://picsum.photos/400/300?random=6",
+                likes: 0
+            },
+            {
+                id: 7,
+                title: "Dashboard Interface",
+                description: "Analytics dashboard design with intuitive data visualization and user-friendly interface elements.",
+                category: "Dashboard",
+                image: "https://picsum.photos/400/300?random=7",
+                likes: 0
+            },
+            {
+                id: 8,
+                title: "Print Design Collection",
+                description: "Collection of print materials including brochures, business cards, and promotional materials.",
+                category: "Print Design",
+                image: "https://picsum.photos/400/300?random=8",
+                likes: 0
+            }
+        ];
+
+        let stats = {
+            totalViews: 0,
+            totalLikes: 0,
+            animationCount: 0
+        };
+
+        function createImageCard(item) {
+            return `
+                <div class="image-card" data-id="${item.id}" onclick="openModal('${item.image}'); incrementViews();">
+                    <div class="image-container">
+                        <img src="${item.image}" alt="${item.title}" loading="lazy">
+                        <div class="image-overlay">
+                            <div class="overlay-text">Click to view full size</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-description">${item.description}</div>
+                        <div class="card-footer">
+                            <div class="card-category">${item.category}</div>
+                            <button class="like-btn" onclick="event.stopPropagation(); toggleLike(${item.id})">
+                                ❤️ <span id="likes-${item.id}">${item.likes}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initializeGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = portfolioItems.map(item => createImageCard(item)).join('');
+            updateStats();
+        }
+
+        function animateImages(animationType) {
+            const cards = document.querySelectorAll('.image-card');
+            
+            // Reset all animations
+            cards.forEach(card => {
+                card.className = 'image-card';
+                // Force reflow
+                card.offsetHeight;
+            });
+            
+            // Apply new animation with staggered delay
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add(animationType);
+                }, index * 150); // 150ms delay between each card
+            });
+            
+            // Update animation counter
+            stats.animationCount++;
+            updateStats();
+            
+            // Add visual feedback to button
+            const buttons = document.querySelectorAll('.animate-btn');
+            buttons.forEach(btn => btn.style.transform = 'scale(0.95)');
+            setTimeout(() => {
+                buttons.forEach(btn => btn.style.transform = 'scale(1)');
+            }, 100);
+        }
+
+        function toggleLike(itemId) {
+            const item = portfolioItems.find(p => p.id === itemId);
+            const likeBtn = document.querySelector(`[data-id="${itemId}"] .like-btn`);
+            const likeSpan = document.getElementById(`likes-${itemId}`);
+            
+            if (likeBtn.classList.contains('liked')) {
+                item.likes--;
+                likeBtn.classList.remove('liked');
+                stats.totalLikes--;
+            } else {
+                item.likes++;
+                likeBtn.classList.add('liked');
+                stats.totalLikes++;
+                
+                // Add like animation
+                likeBtn.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    likeBtn.style.transform = 'scale(1)';
+                }, 200);
+            }
+            
+            likeSpan.textContent = item.likes;
+            updateStats();
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = imageSrc;
+            modal.style.display = 'block';
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function incrementViews() {
+            stats.totalViews++;
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalImages').textContent = portfolioItems.length;
+            document.getElementById('totalLikes').textContent = stats.totalLikes;
+            document.getElementById('viewCount').textContent = stats.totalViews;
+            document.getElementById('animationCount').textContent = stats.animationCount;
+        }
+
+        // Event listeners
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+        document
