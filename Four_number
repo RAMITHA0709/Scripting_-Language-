@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Validation System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .input-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+            font-size: 1.1em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            font-size: 18px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+        }
+        
+        input.valid {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        input.invalid {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .validation-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .valid-result {
+            background-color: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .invalid-result {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .info-result {
+            background-color: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .number-display {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .sorted-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .number-chip {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(40,167,69,0.3);
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background: linear-gradient(45deg, #6f42c1, #e83e8c);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(111,66,193,0.3);
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .clear-button {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+        
+        .clear-button:hover {
+            box-shadow: 0 6px 20px rgba(220,53,69,0.4);
+        }
+        
+        .example-text {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Number Validation System</h1>
+        
+        <div class="input-section">
+            <label for="numberInput">Enter a four-digit number:</label>
+            <input type="text" id="numberInput" placeholder="e.g., 1234" maxlength="4">
+            <p class="example-text">Enter a number where the first digit is not zero, and digits are in ascending order</p>
+            
+            <button onclick="validateNumber()">Validate Number</button>
+            <button onclick="addToCollection()">Add to Collection</button>
+            <button class="clear-button" onclick="clearAll()">Clear All</button>
+        </div>
+        
+        <div id="validationResult"></div>
+        
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h3>📊 Number Collection Statistics</h3>
+            
+            <div class="statistics">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div>Total Numbers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="averageValue">0</div>
+                    <div>Average Value</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="smallestNumber">-</div>
+                    <div>Smallest</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="largestNumber">-</div>
+                    <div>Largest</div>
+                </div>
+            </div>
+            
+            <div class="number-display">
+                <h4>📈 Your Numbers (Sorted Ascending):</h4>
+                <div class="sorted-numbers" id="sortedNumbers"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let numberCollection = [];
+
+        function validateNumber() {
+            const input = document.getElementById('numberInput').value.trim();
+            const resultDiv = document.getElementById('validationResult');
+            
+            // Clear previous results
+            resultDiv.innerHTML = '';
+            
+            // Check if input is empty
+            if (!input) {
+                showValidationResult('Please enter a number.', 'invalid');
+                return false;
+            }
+            
+            // Check if input contains only digits
+            if (!/^\d+$/.test(input)) {
+                showValidationResult('Please enter only numeric digits (0-9).', 'invalid');
+                updateInputStyle(false);
+                return false;
+            }
+            
+            // Check if input is exactly 4 digits
+            if (input.length !== 4) {
+                showValidationResult(`Number must be exactly 4 digits. You entered ${input.length} digit(s).`, 'invalid');
+                updateInputStyle(false);
+                return false;
+            }
+            
+            // Convert to array of digits for easier manipulation
+            const digits = input.split('').map(Number);
+            
+            // Check if first digit is not zero
+            if (digits[0] === 0) {
+                showValidationResult('The first digit cannot be zero.', 'invalid');
+                updateInputStyle(false);
+                return false;
+            }
+            
+            // Check if digits are in ascending order
+            let isAscending = true;
+            for (let i = 0; i < digits.length - 1; i++) {
+                if (digits[i] >= digits[i + 1]) {
+                    isAscending = false;
+                    break;
+                }
+            }
+            
+            if (!isAscending) {
+                showValidationResult('Digits must be in strictly ascending order (each digit must be smaller than the next).', 'invalid');
+                updateInputStyle(false);
+                return false;
+            }
+            
+            // If all validations pass
+            showValidationResult(`✅ Valid! "${input}" meets all criteria: 4 digits, first digit not zero, ascending order.`, 'valid');
+            updateInputStyle(true);
+            return true;
+        }
+
+        function showValidationResult(message, type) {
+            const resultDiv = document.getElementById('validationResult');
+            resultDiv.innerHTML = `<div class="validation-result ${type}-result">${message}</div>`;
+        }
+
+        function updateInputStyle(isValid) {
+            const input = document.getElementById('numberInput');
+            input.className = isValid ? 'valid' : 'invalid';
+        }
+
+        function addToCollection() {
+            if (validateNumber()) {
+                const input = document.getElementById('numberInput').value.trim();
+                const number = parseInt(input);
+                
+                // Check if number already exists in collection
+                if (numberCollection.includes(number)) {
+                    showValidationResult(`⚠️ Number ${input} is already in your collection.`, 'info');
+                    return;
+                }
+                
+                // Add to collection
+                numberCollection.push(number);
+                showValidationResult(`✅ Number ${input} added to collection successfully!`, 'valid');
+                
+                // Update display
+                updateStatistics();
+                updateSortedDisplay();
+                showResultsSection();
+                
+                // Clear input for next entry
+                document.getElementById('numberInput').value = '';
+                document.getElementById('numberInput').className = '';
+            }
+        }
+
+        function updateStatistics() {
+            if (numberCollection.length === 0) {
+                return;
+            }
+            
+            // Update total count
+            document.getElementById('totalCount').textContent = numberCollection.length;
+            
+            // Calculate and update average
+            const sum = numberCollection.reduce((a, b) => a + b, 0);
+            const average = (sum / numberCollection.length).toFixed(1);
+            document.getElementById('averageValue').textContent = average;
+            
+            // Find and update smallest and largest
+            const smallest = Math.min(...numberCollection);
+            const largest = Math.max(...numberCollection);
+            document.getElementById('smallestNumber').textContent = smallest;
+            document.getElementById('largestNumber').textContent = largest;
+        }
+
+        function updateSortedDisplay() {
+            const sortedNumbers = [...numberCollection].sort((a, b) => a - b);
+            const container = document.getElementById('sortedNumbers');
+            
+            container.innerHTML = '';
+            sortedNumbers.forEach(number => {
+                const chip = document.createElement('div');
+                chip.className = 'number-chip';
+                chip.textContent = number;
+                container.appendChild(chip);
+            });
+        }
+
+        function showResultsSection() {
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+
+        function clearAll() {
+            if (numberCollection.length === 0) {
+                showValidationResult('Collection is already empty.', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to clear all ${numberCollection.length} numbers from your collection?`)) {
+                numberCollection = [];
+                document.getElementById('numberInput').value = '';
+                document.getElementById('numberInput').className = '';
+                document.getElementById('validationResult').innerHTML = '';
+                document.getElementById('resultsSection').style.display = 'none';
+                
+                showValidationResult('🗑️ Collection cleared successfully.', 'info');
+            }
+        }
+
+        // Real-time validation as user types
+        document.getElementById('numberInput').addEventListener('input', function() {
+            const input = this.value;
+            
+            // Remove any non-digit characters
+            this.value = input.replace(/\D/g, '');
+            
+            // Limit to 4 digits
+            if (this.value.length > 4) {
+                this.value = this.value.slice(0, 4);
+            }
+            
+            // Clear previous styling if input is being modified
+            if (this.value !== input) {
+                this.className = '';
+            }
+        });
+
+        // Validate on Enter key press
+        document.getElementById('numberInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                validateNumber();
+            }
+        });
+
+        // Initialize page
+        document.getElementById('numberInput').focus();
+    </script>
+</body>
+</html>
